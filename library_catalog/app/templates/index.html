@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Library Catalog</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>📚 Library Catalog</h1>
+
+    <section class="panel">
+      <h2>Add / Update Book</h2>
+      <form id="f">
+        <input id="id" type="hidden" />
+        <div class="form-group">
+          <label>Title</label>
+          <input id="title" placeholder="e.g., Clean Code" required />
+        </div>
+        <div class="form-group">
+          <label>Author</label>
+          <input id="author" placeholder="e.g., Robert C. Martin" required />
+        </div>
+        <div class="form-group">
+          <label>ISBN</label>
+          <input id="isbn" placeholder="e.g., 9780132350884" required />
+        </div>
+        <div class="form-group">
+          <label>Copies</label>
+          <input id="copies" type="number" min="0" value="1" required />
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">Save Book</button>
+          <button type="button" id="reset" class="btn-secondary">Reset</button>
+        </div>
+      </form>
+      <div id="msg" class="msg"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Books List</h2>
+      <input id="q" placeholder="Search by title, author, or ISBN..." class="search-box" />
+      <div id="table"></div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
