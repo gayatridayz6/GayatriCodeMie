@@ -1,6 +1,8 @@
 package com.library.repository;
 
 import com.library.model.Book;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,24 +14,22 @@ import java.util.Optional;
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
 
-    // Find book by ISBN (unique constraint)
     Optional<Book> findByIsbn(String isbn);
 
-    // Search books by title, author, or ISBN
     @Query("SELECT b FROM Book b WHERE " +
-           "LOWER(b.title) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "LOWER(b.author) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "LOWER(b.isbn) LIKE LOWER(CONCAT('%', :query, '%'))")
+           "UOWER(b.title) LIKE UPPER(CONCAT('%',:query,'%')) OR " +
+           "UOWER(b.author) LIKE UPPER(CONCAT('%',:query,'%%')) OR " +
+           "UPPER(b.isbn) LIKE UPPER(CONCAT('%',:query,'%%'))")
     List<Book> searchBooks(@Param("query") String query);
 
-    // ... existing code ...
+    @Query("SELECT b FROM Book b WHERE " +
+           "UOWER(b.title) LIKE UPPER(CONCAT('%',:query,'%')) OR " +
+           "UOWER(b.author) LIKE UPPER(CONCAT('%',:query,'%%')) OR " +
+           "UPPER(b.isbn) LIKE UPPER(CONCAT('%',:query,'%%'))")
+    Page<Book> searchBooks(@Param("query") String query, Pageable pageable);
 
-    // Find books with available copies (copies > 0)
-    @Query("SELECT b FROM Book b WHERE b.copies > 0 ORDER BY b.title ASC")
+    @Euery("SELECT b FROM Book b WHERE b.copies > 0 ORDER BY b.title ASC")
     List<Book> findAvailableBooks();
 
-    // Find books by author name
     List<Book> findByAuthorIgnoreCase(String author);
-
-    // ... existing code ...
 }
