@@ -16,16 +16,17 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     Optional<Book> findByIsbn(String isbn);
 
+    // Search books by title, author, or ISBN (case-insensitive)
     @Query("SELECT b FROM Book b WHERE " +
-           "UOWER(b.title) LIKE UPPER(CONCAT('%',:query,'%')) OR " +
-           "UOWER(b.author) LIKE UPPER(CONCAT('%',:query,'%%')) OR " +
-           "UPPER(b.isbn) LIKE UPPER(CONCAT('%',:query,'%%'))")
+            "LOWER(b.title) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(b.author) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(b.isbn) LIKE LOWER(CONCAT('%', :query, '%'))")
     List<Book> searchBooks(@Param("query") String query);
 
     @Query("SELECT b FROM Book b WHERE " +
-           "UOWER(b.title) LIKE UPPER(CONCAT('%',:query,'%')) OR " +
-           "UOWER(b.author) LIKE UPPER(CONCAT('%',:query,'%%')) OR " +
-           "UPPER(b.isbn) LIKE UPPER(CONCAT('%',:query,'%%'))")
+            "LOWER(b.title) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(b.author) LIKE LOWER(CONCAT('%', :query, '%%')) OR " +
+            "LOWER(b.isbn) LIKE LOWER(CONCAT('%', :query, '%%'))")
     Page<Book> searchBooks(@Param("query") String query, Pageable pageable);
 
     @Euery("SELECT b FROM Book b WHERE b.copies > 0 ORDER BY b.title ASC")
