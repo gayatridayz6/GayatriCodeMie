@@ -1,80 +1,122 @@
-# MyTestApp_CodeMie - Three Flask Starter Projects
+# Library Catalog - Java Spring Boot + React.js
 
-A collection of three independent, minimal Flask applications demonstrating full-stack development with Python/Flask.
+A full-stack book library management system with Java backend and React frontend.
 
-## Projects
+## Features
 
-### 1. Inventory Tracker
-A basic inventory/asset tracking system with CRUD operations, low-stock filtering, and search.
-- **Path:** `inventory_tracker/`
-- **Features:** Create/read/update/delete items, search by name/SKU/location, low-stock alerts
-- **Tech:** Flask, SQLite (in-memory for MVP), Pytest
+- ✅ Add, view, update, and delete books
+- ✅ Search by title, author, or ISBN
+- ✅ Track number of copies available
+- ✅ Duplicate ISBN protection
+- ✅ Modern React UI with Axios
+- ✅ REST API with Spring Boot
+- ✅ JUnit tests for backend
+- ✅ Jest tests for frontend
 
-### 2. Library Catalog
-A book library catalog with search and borrowing records.
-- **Path:** `library_catalog/`
-- **Features:** Add books, search by title/author/ISBN, track copies
-- **Tech:** Flask, Pytest
+## Tech Stack
 
-### 3. Taskboard Manager
-A personal task/kanban board with status filtering.
-- **Path:** `taskboard_manager/`
-- **Features:** Create tasks, filter by status (todo/doing/done)
-- **Tech:** Flask, Pytest
-
-## Quick Start (All Projects)
-
-Each project is independent and follows the same pattern:
-
-```powershell
-# Navigate to a project
-cd C:\Users\gayatri_mungarwadi\Documents\Capston\MyTestApp_CodeMie\inventory_tracker
-
-# Create and activate virtual environment
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run tests
-pytest -q
-
-# Run app (opens http://127.0.0.1:5000/)
-python run.py
-```
-
-Repeat for `library_catalog/` and `taskboard_manager/`.
+- **Backend:** Java 11+, Spring Boot 3.0, Maven
+- **Frontend:** React 18, JavaScript ES6, Axios, CSS3
+- **Database:** H2 (in-memory) - easily swap to PostgreSQL
+- **Testing:** JUnit 5, Jest, React Testing Library
 
 ## Project Structure
 
-Each project contains:
 ```
-project_name/
-├── app/
-│   ├── __init__.py          (Flask app factory)
-│   ├── routes.py            (API routes + home)
-│   ├── store.py             (In-memory data + validators)
-│   ├── templates/
-│   │   └── index.html       (Simple web UI)
-│   └── static/
-│       ├── app.js           (Frontend logic)
-│       └── styles.css       (Styling)
-├── tests/
-│   └── test_api.py          (Pytest tests)
-├── run.py                   (Entry point)
-├── requirements.txt         (Dependencies)
-└── README.md                (Project-specific guide)
+library-catalog/
+├── backend/                    (Spring Boot Java)
+│   ├── src/
+│   │   ├── main/java/com/library/
+│   │   │   ├── Application.java
+│   │   │   ├── controller/BookController.java
+│   │   │   ├── service/BookService.java
+│   │   │   ├── repository/BookRepository.java
+│   │   │   └── model/Book.java
+│   │   └── test/java/com/library/BookServiceTest.java
+│   ├── pom.xml
+│   └── README.md
+├── frontend/                   (React.js)
+│   ├── public/index.html
+│   ├── src/
+│   │   ├── App.js
+│   │   ├── components/
+│   │   │   ├── BookForm.js
+│   │   │   ├── BookList.js
+│   │   │   └── SearchBar.js
+│   │   ├── services/api.js
+│   │   ├── App.css
+│   │   └── index.js
+│   ├── package.json
+│   └── README.md
+└── README.md (this file)
 ```
 
-## Notes
+## Quick Start
 
-- All projects use **in-memory storage** for MVP; swap to SQLAlchemy + SQLite/PostgreSQL later.
-- Each app runs on `http://127.0.0.1:5000/` independently.
-- Tests are lightweight and focus on core API paths.
-- No external frontend framework; vanilla HTML/CSS/JS for simplicity.
+### Backend Setup (Java/Maven)
+
+```powershell
+cd backend
+
+# Build
+mvn clean install
+
+# Run (starts on http://localhost:8080)
+mvn spring-boot:run
+
+# Run Tests
+mvn test
+```
+
+### Frontend Setup (React)
+
+```powershell
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start dev server (http://localhost:3000)
+npm start
+
+# Run tests
+npm test
+```
+
+## API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/health` | Health check |
+| GET | `/api/books` | List books (supports `?search=query`) |
+| POST | `/api/books` | Create new book |
+| PUT | `/api/books/{id}` | Update book |
+| DELETE | `/api/books/{id}` | Delete book |
+
+## Example Request
+
+```bash
+POST http://localhost:8080/api/books
+Content-Type: application/json
+
+{
+  "title": "Clean Code",
+  "author": "Robert C. Martin",
+  "isbn": "9780132350884",
+  "copies": 3
+}
+```
+
+## Development Workflow
+
+1. **Start Backend:** `cd backend && mvn spring-boot:run`
+2. **Start Frontend:** `cd frontend && npm start`
+3. **Open Browser:** http://localhost:3000
+4. **Backend API:** http://localhost:8080/api/books
+5. **Run Tests:**
+   - Backend: `mvn test` (in backend folder)
+   - Frontend: `npm test` (in frontend folder)
 
 ---
 
-**Created:** August 2026  
-**IntelliJ Ready:** Yes, each app can be run as a separate Flask run configuration.
+**Ready to use.** Both backend and frontend configured for local development with live reload.
