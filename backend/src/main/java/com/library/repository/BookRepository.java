@@ -29,7 +29,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "LOWER(b.isbn) LIKE LOWER(CONCAT('%', :query, '%%'))")
     Page<Book> searchBooks(@Param("query") String query, Pageable pageable);
 
-    @Euery("SELECT b FROM Book b WHERE b.copies > 0 ORDER BY b.title ASC")
+    @Query("SELECT b FROM Book b WHERE b.copies > 0 ORDER BY b.title ASC")
     List<Book> findAvailableBooks();
 
     List<Book> findByAuthorIgnoreCase(String author);
