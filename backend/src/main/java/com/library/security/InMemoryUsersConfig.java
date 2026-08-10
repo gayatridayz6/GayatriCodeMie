@@ -19,12 +19,12 @@ public class InMemoryUsersConfig {
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
         UserDetails librarian = User.withUsername("librarian")
               .password(passwordEncoder.encode("libc123"))
-              .roles(ROLE_LIBRARIAN.name())
+              .roles(Role.LIBRARIAN.name())
             .build();
 
         UserDetails viewer = User.withUsername("viewer")
               .password(passwordEncoder.encode("view123"))
-              .roles(ROLE_VIEWER.name())
+              .roles(Role.VIEWER.name())
             .build();
 
         return new InMemoryUserDetailsManager(librarian, viewer);
