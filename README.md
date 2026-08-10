@@ -1,6 +1,6 @@
 # Library Catalog - Java Spring Boot + React.js
 
-A full-stack book library management system with Java backend and React frontend.
+A full-stack Java/Spring Boot and React application. The current feature branch adds accommodation search price display and advanced currency filtering for USD, EUR, and GBP using backend-provided currency reference metadata.
 
 ## Features
 
@@ -8,14 +8,18 @@ A full-stack book library management system with Java backend and React frontend
 - ✅ Search by title, author, or ISBN
 - ✅ Track number of copies available
 - ✅ Duplicate ISBN protection
+- ✅ Accommodation search results with nightly and total price display
+- ✅ Advanced currency selector for USD, EUR, GBP
+- ✅ Currency labels sourced from the backend Currency_Codes data source (`<Code> <Numeric> <Currency name>`)
+- ✅ Backend FX conversion flow with clear metadata/FX error contracts
 - ✅ Modern React UI with Axios
 - ✅ REST API with Spring Boot
 - ✅ JUnit tests for backend
-- ✅ Jest tests for frontend
+- ✅ Jest/React scripts configuration for frontend
 
 ## Tech Stack
 
-- **Backend:** Java 11+, Spring Boot 3.0, Maven
+- **Backend:** Java 11+, Spring Boot 3.1, Maven
 - **Frontend:** React 18, JavaScript ES6, Axios, CSS3
 - **Database:** H2 (in-memory) - easily swap to PostgreSQL
 - **Testing:** JUnit 5, Jest, React Testing Library
@@ -27,25 +31,30 @@ library-catalog/
 ├── backend/                    (Spring Boot Java)
 │   ├── src/
 │   │   ├── main/java/com/library/
-│   │   │   ├── Application.java
-│   │   │   ├── controller/BookController.java
-│   │   │   ├── service/BookService.java
-│   │   │   ├── repository/BookRepository.java
-│   │   │   └── model/Book.java
-│   │   └── test/java/com/library/BookServiceTest.java
+│   │   │   ├── LibraryCatalogApplication.java
+│   │   │   ├── config/CurrencyCodeDataLoader.java
+│   │   │   ├── controller/
+│   │   │   │   ├── AccommodationController.java
+│   │   │   │   ├── ApiExceptionHandler.java
+│   │   │   │   ├── BookController.java
+│   │   │   │   └── CurrencyController.java
+│   │   │   ├── dto/
+│   │   │   ├── exception/
+│   │   │   ├── model/
+│   │   │   │   ├── Book.java
+│   │   │   │   └── CurrencyCode.java
+│   │   │   ├── repository/
+│   │   │   └── service/
+│   │   └── test/java/com/library/service/
 │   ├── pom.xml
 │   └── README.md
 ├── frontend/                   (React.js)
 │   ├── public/index.html
 │   ├── src/
 │   │   ├── App.js
-│   │   ├── components/
-│   │   │   ├── BookForm.js
-│   │   │   ├── BookList.js
-│   │   │   └── SearchBar.js
-│   │   ├── services/api.js
 │   │   ├── App.css
-│   │   └── index.js
+│   │   ├── index.js
+│   │   └── services/api.js
 │   ├── package.json
 │   └── README.md
 └── README.md (this file)
@@ -79,6 +88,9 @@ npm install
 # Start dev server (http://localhost:3000)
 npm start
 
+# Build / lint
+npm run build
+
 # Run tests
 npm test
 ```
@@ -92,18 +104,40 @@ npm test
 | POST | `/api/books` | Create new book |
 | PUT | `/api/books/{id}` | Update book |
 | DELETE | `/api/books/{id}` | Delete book |
+| GET | `/api/v1/currencies?codes=USD,EUR,GBP` | Supported currency metadata |
+| GET | `/api/v1/accommodations?currency=USD` | Accommodation results in selected display currency |
 
-## Example Request
+## Currency Response Example
 
-```bash
-POST http://localhost:8080/api/books
-Content-Type: application/json
-
+```json
 {
-  "title": "Clean Code",
-  "author": "Robert C. Martin",
-  "isbn": "9780132350884",
-  "copies": 3
+  "data": [
+    { "code": "USD", "numeric": 840, "name": "United States dollar", "label": "USD 840 United States dollar" },
+    { "code": "EUR", "numeric": 978, "name": "Euro", "label": "EUR 978 Euro" },
+    { "code": "GBP", "numeric": 826, "name": "Pound sterling", "label": "GBP 826 Pound sterling" }
+  ]
+}
+```
+
+## Accommodation Response Example
+
+```json
+{
+  "meta": {
+    "appliedCurrency": { "code": "USD", "numeric": 840, "name": "United States dollar", "label": "USD 840 United States dollar" },
+    "fxAsOf": "2026-08-07T00:00:00Z",
+    "conversionUsed": false
+  },
+  "data": [
+    {
+      "id": "acc_123",
+      "name": "Central Hotel",
+      "price": {
+        "nightly": { "amount": 199.99, "currencyCode": "USD" },
+        "total": { "amount": 599.97, "currencyCode": "USD" }
+      }
+    }
+  ]
 }
 ```
 
@@ -112,7 +146,7 @@ Content-Type: application/json
 1. **Start Backend:** `cd backend && mvn spring-boot:run`
 2. **Start Frontend:** `cd frontend && npm start`
 3. **Open Browser:** http://localhost:3000
-4. **Backend API:** http://localhost:8080/api/books
+4. **Backend APIs:** http://localhost:8080/api/books, http://localhost:8080/api/v1/accommodations
 5. **Run Tests:**
    - Backend: `mvn test` (in backend folder)
    - Frontend: `npm test` (in frontend folder)

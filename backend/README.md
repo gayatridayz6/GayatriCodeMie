@@ -1,10 +1,10 @@
 # Library Catalog Backend (Java Spring Boot)
 
-REST API for the Library Catalog system.
+REST API for the Library Catalog system plus the EPMCDMETST-58713 accommodation currency display APIs.
 
 ## Tech Stack
 
-- Java 11
+- Java 17
 - Spring Boot 3.1
 - Spring Data JPA
 - H2 Database (in-memory)
@@ -14,7 +14,7 @@ REST API for the Library Catalog system.
 
 ### Prerequisites
 
-- Java 11+
+- Java 17+
 - Maven 3.6+
 
 ### Setup
@@ -35,8 +35,6 @@ mvn spring-boot:run
 mvn test
 ```
 
-Expected output: 5 tests passed
-
 ## API Endpoints
 
 | Method | Path | Description |
@@ -47,59 +45,32 @@ Expected output: 5 tests passed
 | POST | `/api/books` | Create new book |
 | PUT | `/api/books/{id}` | Update book |
 | DELETE | `/api/books/{id}` | Delete book |
+| GET | `/api/v1/currencies?codes=USD,EUR,GBP` | Return supported currency metadata from Currency_Codes |
+| GET | `/api/v1/accommodations?currency=USD` | Return accommodation prices converted to selected currency |
 
-## Example Requests
+## Currency Metadata Example
 
-### Create Book
 ```bash
-curl -X POST http://localhost:8080/api/books \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Clean Code",
-    "author": "Robert C. Martin",
-    "isbn": "9780132350884",
-    "copies": 3
-  }'
+curl "http://localhost:8080/api/v1/currencies?codes=USD,EUR,GBP"
 ```
 
-### List Books
+```json
+{
+  "data": [
+    { "code": "USD", "numeric": 840, "name": "United States dollar", "label": "USD 840 United States dollar" },
+    { "code": "EUR", "numeric": 978, "name": "Euro", "label": "EUR 978 Euro" },
+    { "code": "GBP", "numeric": 826, "name": "Pound sterling", "label": "GBP 826 Pound sterling" }
+  ]
+}
+```
+
+## Accommodation Example
+
 ```bash
-curl http://localhost:8080/api/books
+curl "http://localhost:8080/api/v1/accommodations?currency=GBP"
 ```
 
-### Search Books
-```bash
-curl "http://localhost:8080/api/books?search=clean"
-```
-
-### Update Book
-```bash
-curl -X PUT http://localhost:8080/api/books/1 \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Clean Code (2nd Ed)",
-    "copies": 5
-  }'
-```
-
-### Delete Book
-```bash
-curl -X DELETE http://localhost:8080/api/books/1
-```
-
-## Project Structure
-
-```
-src/
-├── main/java/com/library/
-│   ├── LibraryCatalogApplication.java
-│   ├── controller/BookController.java
-│   ├── service/BookService.java
-│   ├── repository/BookRepository.java
-│   └── model/Book.java
-└── test/java/com/library/
-    └── service/BookServiceTest.java
-```
+The response includes `meta.appliedCurrency`, `meta.fxAsOf`, and each accommodation `price.nightly` / `price.total` in the selected currency.
 
 ---
 
