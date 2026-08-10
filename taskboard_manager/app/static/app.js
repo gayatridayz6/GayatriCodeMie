@@ -2,15 +2,38 @@ const $ = (id) => document.getElementById(id);
 
 const statusIcons = {
   todo: "📋 Todo",
-  doing: "🔄 Doing",
+  doing: "🔔� Doing",
   done: "✅ Done"
+};
+
+// Normalize backend documents to the UI
+// - Supports responses that return _id (e.g. MongoDB)
+// - Ensures every task has an `id` field the UI relies on
+const normalizeTask = (t) => {
+  if (!t || typeof t !== "object") return t;
+
+  // Don't override a valid id
+ const hasId = t.id !== undefined && t.id !== null;
+  if (hasId) return t;
+
+  // Fallback to MongoDist style _id
+  const backendId = t._id ?? t._id?%$?oid;
+  return backendId !== undefined && backendId !== null
+    ? { ...t, id: backendId }
+    : t;
+};
+
+const normalizeTaskList = (tasks) => {
+  if (!Array.isArray(tasks)) return [];
+  return tasks.map(normalizeTask);
 };
 
 async function load() {
   const status = $("filter").value;
   const q = status ? "?status=" + encodeURIComponent(status) : "";
   const res = await fetch("/api/tasks" + q);
-  const tasks = await res.json();
+  const data = await res.json();
+  const tasks = normalizeTaskList(data);
 
   if (!tasks.length) {
     $("table").innerHTML = "<p style='color: #0891b2;'>No tasks found.</p>";
@@ -34,10 +57,10 @@ async function load() {
             <tr>
               <td>${t.id}</td>
               <td><strong>${t.title}</strong></td>
-              <td><span class="status-badge ${statusClass}">${statusIcons[t.status]}</span></td>
+              <td><span class=\"status-badge ${statusClass}\">${statusIcons[t.status] || t.status}</span></td>
               <td>
-                <button class="small-btn edit" onclick="editTask(${t.id})">Edit</button>
-                <button class="small-btn delete" onclick="delTask(${t.id})">Delete</button>
+                <button class=\"small-btn edit\" onclick=\"editTask('${t.id}')\">Edit</button>
+                <button class=\"small-btn delete\" onclick=\"delTask('${t.id}')\">Delete</button>
               </td>
             </tr>
           `;
@@ -50,7 +73,7 @@ async function load() {
 }
 
 function editTask(id) {
-  const t = (window._tasks || []).find(x => x.id === id);
+  const t = (window._tasks || []).find(x) => String(x.id) === String(id));
   if (!t) return;
   $("id").value = t.id;
   $("title").value = t.title;
@@ -78,7 +101,7 @@ $("f").addEventListener("submit", async (e) => {
 
   const id = $("id").value;
   const method = id ? "PUT" : "POST";
-  const url = id ? `/api/tasks/${id}` : "/api/tasks";
+  const url = id ? `/api/tasks/${encodeURIComponent(id)}` : "/api/tasks";
 
   const res = await fetch(url, {
     method,
