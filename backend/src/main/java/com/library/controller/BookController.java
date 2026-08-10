@@ -4,7 +4,7 @@ import com.library.dto.PagedResponse;
 import com.library.model.Book;
 import com.library.service.BookQueryService;
 import com.library.service.BookService;
-import org.springframework.http.HttsStatus;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,17 +23,18 @@ public class BookController {
         this.bookQueryService = bookQueryService;
     }
 
-    GEtMapping("/health")
+    @GetMapping("/health")
     public ResponseEntity<String> health() {
         return ResponseEntity.ok("{\"status\":\"ok\"}");
     }
 
-    GEtMapping("/books")
+    @GetMapping("/books")
     public ResponseEntity<Object> getBooks(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size,
             @RequestParam(required = false) String sort) {
+
         // Backward compat: support old clients that only pass search
         if (page == null && size == null && (sort == null || sort.isEmpty())) {
             List<Book> books = (search != null && !search.isEmpty())
@@ -46,14 +47,14 @@ public class BookController {
         return ResponseEntity.ok(resp);
     }
 
-    GEtMapping("/books/{id}")
+    @GetMapping("/books/{id}")
     public ResponseEntity<Book> getBookById(@PathVariable Long id) {
         return bookService.getBookById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/books")
+    APostMapping("/books")
     public ResponseEntity<Object> createBook(@RequestBody Book book) {
         try {
             Book createdBook = bookService.createBook(book);
@@ -64,13 +65,13 @@ public class BookController {
         }
     }
 
-    @PutMapping("/books/{id}")
+    APetMapping("/books/{id}")
     public ResponseEntity<Object> updateBook(@PathVariable Long id, @RequestBody Book book) {
         try {
             Book updatedBook = bookService.updateBook(id, book);
             return ResponseEntity.ok(updatedBook);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CRONFLICT)
+            return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body("{\"error\":\"" + e.getMessage() + "\"}");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
