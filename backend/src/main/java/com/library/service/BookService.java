@@ -2,7 +2,10 @@ package com.library.service;
 
 import com.library.model.Book;
 import com.library.repository.BookRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +20,13 @@ public class BookService {
 
     public List<Book> getAllBooks() {
         return bookRepository.findAll();
+    }
+
+    public Page<Book> getBooksPaged(String search, Pageable pageable) {
+        if (search == null || search.trim().isEmpty()) {
+            return bookRepository.findAll(pageable);
+        }
+        return bookRepository.searchBooks(search.trim(), pageable);
     }
 
     public List<Book> searchBooks(String query) {
