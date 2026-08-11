@@ -6,6 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +43,17 @@ class BookServiceTest {
     }
 
     @Test
+    void testGetBooksPaged_NoSearch_UsesFindAllPageable() {
+        Page<Book> page = new PageImpl<>(List.of(new Book("t", "a", "i", 1)));
+        when(bookRepository.findAll(any(PageRequest.class))).thenReturn(page);
+
+        Page<Book> result = bookService.getBooksPaged(null, PageRequest.of(0, 20));
+
+        assertEquals(1, result.getContent().size());
+        verify(bookRepository, times(1)).findAll(any(PageRequest.class));
+    }
+
+    @Test
     void testCreateBook_Success() {
         Book book = new Book("Clean Code", "Robert Martin", "ISBN-123", 3);
 
@@ -60,9 +74,7 @@ class BookServiceTest {
 
         when(bookRepository.findByIsbn("ISBN-123")).thenReturn(Optional.of(existingBook));
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            bookService.createBook(newBook);
-        });
+        assertThrows(IllegalArgumentException.class, () -> bookService.createBook(newBook));
     }
 
     @Test
@@ -78,8 +90,6 @@ class BookServiceTest {
     void testDeleteBook_NotFound() {
         when(bookRepository.existsById(999L)).thenReturn(false);
 
-        assertThrows(RuntimeException.class, () -> {
-            bookService.deleteBook(999L);
-        });
+        assertThrows(RuntimeException.class, () -> bookService.deleteBook(999L));
     }
 }
